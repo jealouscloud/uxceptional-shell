@@ -1,26 +1,35 @@
 import imgui
+from enum import Enum, Flag, auto
 
-from enum import Enum, auto
 
-class Direction(Enum):
-    Nothing = auto()
+class Direction(Flag):
+    Nothing = 0
     Left = auto()
-    Right = auto
+    Right = auto()
     Top = auto()
     Bottom = auto()
     Center = auto()
  
 
+class MonitorPreference(Enum):
+    Unset = 0
+    Primary = auto()
+    Active = auto()
+
+
 class ShellWindow:
     """
     Represents the state and settings of an OS window managed by our application
     """
+
     def __init__(
                     self, 
                     window_title="uxceptional",
                     min_size=None,
                     max_size=None,
-                    dock_direction = Direction.Nothing):
+        dock_direction=Direction.Nothing,
+        monitor_preference=MonitorPreference.Unset,
+    ):
         if not min_size:
             min_size = [100, 100]
 
@@ -29,14 +38,18 @@ class ShellWindow:
             # Maybe this could be screen size
             max_size = [2147483647, 2147483647]
 
-        self.max_size= max_size
+        self.max_size = max_size
         self.size = min_size
         self.window_size = self.size
-        self.padding = [0,0]
+        self.padding = [0, 0]
         self.data = {}
         self.pos = [-1, -1]
         self.dock = dock_direction
         self.window_title = window_title
+        self.monitor_preference = monitor_preference
+        self.renderer = None  # GlfwRenderer
+        self.window_id = None
+        self.context = None
     
     def init(self):
         """
