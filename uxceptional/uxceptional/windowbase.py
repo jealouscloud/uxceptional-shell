@@ -4,6 +4,7 @@ from typing import Any, Type
 from uxceptional.shellwindow import ShellWindow
 from abc import abstractmethod
 from threading import Lock, Thread
+from contextlib import contextmanager
 import asyncio
 import imgui
 
@@ -70,6 +71,19 @@ class WindowBase:
         Attach a datafetcher to run during update_data
         """
         self.fetchers.append(datafetcher)
+
+    @contextmanager
+    def imgui_window(self, title, flags=None):
+        """
+        wrapper for imgui.begin which also sets some sane defaults.
+        if flags is unset self.window_flags will be used
+        """
+        window = imgui.begin(title, flags = self.window_flags if flags is None else flags)
+        try:
+            imgui.set_window_position(0, 0)
+            yield window
+        finally:
+            imgui.end()
 
     def _data_thread(self):
         """
