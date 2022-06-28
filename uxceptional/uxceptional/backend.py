@@ -5,57 +5,86 @@ import OpenGL.GL as gl
 import sys
 from ewmh import EWMH
 from imgui.integrations.glfw import GlfwRenderer
+from .shellwindow import ShellWindow
+from .windowbase import WindowBase
+
 
 class Backend:
     windowlist = []
-    def init():
-        imgui.create_context()
+    fonts = {
+        "default": None
+    }
 
-    def run_backend(create_window, shellwindow, window_coord):
+    def add_window(windowbase: WindowBase):
+        """
+        Must be called on the main thread.
+        """
+        shellwindow = windowbase.state
+        default_font = Backend.fonts["default"]
+        if default_font == None:
+            shellwindow.context = imgui.create_context()
+            io = imgui.get_io()
+            Backend.fonts["default"] = io.fonts
+        else:
+            shellwindow.context = imgui.create_context(default_font)
+
         window = Backend.impl_glfw_init(
-            shellwindow.window_title,
-            shellwindow.min_size[0],
-            shellwindow.min_size[1],
+            shellwindow.window_title, *shellwindow.min_size
         )
-        impl = GlfwRenderer(window)
+        renderer = GlfwRenderer(window)
+        shellwindow.window_id = window
+        shellwindow.renderer = renderer
+        Backend.windowlist.append(windowbase)
+        shellwindow.apply_monitor_preference()
+
+    def run_backend():
         gl.glBlendFunc(gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA)
-        for window in Backend.windowlist:
-            window = window # WindowBase
-            pass
-        while not glfw.window_should_close(window):
+        while Backend.windowlist:
             glfw.poll_events()
-            impl.process_inputs()
-            imgui.new_frame()
-            window_size = glfw.get_window_size(window)
-            create_window()  # type: tuple
-            shellwindow.apply_bounds()
-            returned_size = shellwindow.window_size
-            # imgui.show_test_window()
-            # imgui.show_metrics_window()
-            if returned_size and tuple(returned_size) != tuple(window_size):
-                window_size = returned_size
-                glfw.set_window_size(window, returned_size[0], returned_size[1])
+            for app_window in Backend.windowlist.copy():
+                app_window = app_window  # type: WindowBase
+                window_state = app_window.state
+                impl = window_state.renderer # type: GlfwRenderer
+                gl_window = window_state.window_id
+                glfw.make_context_current(gl_window)
+                if glfw.window_should_close(gl_window):
+                    Backend.windowlist.remove(app_window)
+                    impl.shutdown()
+                    glfw.destroy_window(gl_window)
+                    # TODO: AN IMGUI CONTEXT LEAKS HERE?
+                    continue
 
-            if tuple(shellwindow.pos) != (-1, -1):
-                x, y = glfw.get_window_pos(window)
-                req_x, req_y = shellwindow.pos
-                if req_x == -1:
-                    req_x = x
-                if req_y == -1:
-                    req_y = y
-                if (req_x, req_y) != (x, y):
-                    glfw.set_window_pos(window, req_x, req_y)
+                if imgui.get_current_context() != window_state.context:
+                    imgui.set_current_context(window_state.context)
 
-            gl.glClearColor(0, 0, 0, 0)
-            gl.glClear(gl.GL_COLOR_BUFFER_BIT)
-            glfw.swap_interval(1)
-            imgui.render()
-            impl.render(imgui.get_draw_data())
-            glfw.swap_buffers(window)
+                impl.process_inputs()
+                imgui.new_frame()
+                window_size = glfw.get_window_size(gl_window)
+                app_window.run_create_window()
+                window_state.apply_bounds()
+                returned_size = window_state.window_size
+                if returned_size and tuple(returned_size) != tuple(window_size):
+                    window_size = returned_size
+                    glfw.set_window_size(gl_window, returned_size[0], returned_size[1])
 
-        impl.shutdown()
+                if tuple(window_state.pos) != (-1, -1):
+                    x, y = glfw.get_window_pos(gl_window)
+                    req_x, req_y = window_state.pos
+                    if req_x == -1:
+                        req_x = x
+                    if req_y == -1:
+                        req_y = y
+                    if (req_x, req_y) != (x, y):
+                        glfw.set_window_pos(gl_window, req_x, req_y)
+
+                gl.glClearColor(0, 0, 0, 0)
+                gl.glClear(gl.GL_COLOR_BUFFER_BIT)
+                # glfw.swap_interval(1)
+                imgui.render()
+                impl.render(imgui.get_draw_data())
+                glfw.swap_buffers(gl_window)
+
         glfw.terminate()
-
 
     def impl_glfw_init(window_name, width, height):
         CLASS_NAME = "uxceptional"
@@ -71,7 +100,7 @@ class Backend:
         glfw.window_hint(glfw.TRANSPARENT_FRAMEBUFFER, glfw.TRUE)
         glfw.window_hint(glfw.FOCUS_ON_SHOW, glfw.TRUE)
         glfw.window_hint(glfw.OPENGL_FORWARD_COMPAT, gl.GL_TRUE)
-        
+
         # Create a windowed mode window and its OpenGL context
         window = glfw.create_window(
             int(width), int(height), window_name, None, None
