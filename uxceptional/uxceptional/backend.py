@@ -49,7 +49,7 @@ class Backend:
                 glfw.poll_events()
                 if glfw.window_should_close(gl_window):
                     Backend.windowlist.remove(app_window)
-                    # impl.shutdown() # Normally we would do this, but it just kills our shared font texture
+                    impl.shutdown()
                     glfw.destroy_window(gl_window)
                     # TODO: AN IMGUI CONTEXT LEAKS HERE?
                     continue
