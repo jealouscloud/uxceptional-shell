@@ -78,9 +78,9 @@ class WindowBase:
         wrapper for imgui.begin which also sets some sane defaults.
         if flags is unset self.window_flags will be used
         """
+        imgui.set_next_window_position(0, 0)
         window = imgui.begin(title, flags = self.window_flags if flags is None else flags)
         try:
-            imgui.set_window_position(0, 0)
             yield window
         finally:
             imgui.end()
