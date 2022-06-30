@@ -48,11 +48,13 @@ class WindowBase:
         self.initialized = False
         self.data_thread = Thread(target=self._data_thread, daemon=True)
         self.raise_if_no_data_thread = False
+        self.blocking = True # If no, do not wait for the init thread to finish
 
     async def _init(self):
         """
         Fetch initial data and start data thread
         """
+        if self.blocking: # Wait for the full loop to complete before loading
         for datasource in self.fetchers:
             self.data[datasource.key] = await datasource.function(self.data)
 
