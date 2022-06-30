@@ -9,7 +9,7 @@ class Direction(Flag):
     Top = auto()
     Bottom = auto()
     Center = auto()
- 
+
 
 class MonitorPreference(Enum):
     Unset = 0
@@ -23,10 +23,10 @@ class ShellWindow:
     """
 
     def __init__(
-                    self, 
-                    window_title="uxceptional",
-                    min_size=None,
-                    max_size=None,
+        self,
+        window_title="uxceptional",
+        min_size=None,
+        max_size=None,
         dock_direction=Direction.Nothing,
         monitor_preference=MonitorPreference.Unset,
     ):
@@ -40,7 +40,6 @@ class ShellWindow:
 
         self.max_size = max_size
         self.size = min_size
-        self.window_size = self.size
         self.padding = [0, 0]
         self.data = {}
         self.pos = [-1, -1]
@@ -50,7 +49,7 @@ class ShellWindow:
         self.renderer = None  # GlfwRenderer
         self.window_id = None
         self.context = None
-    
+
     def init(self):
         """
         Initialize window for drawing
@@ -60,7 +59,7 @@ class ShellWindow:
         self.size = self.min_size
         self.pos = [-1, -1] # anything but -1 is a request
         self.padding = [int(self.style.window_padding.x), int(self.style.window_padding.y)]
-    
+
     def apply_bounds(self):
         """
         Apply min_size and max_size to size

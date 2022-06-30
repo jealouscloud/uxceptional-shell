@@ -64,8 +64,8 @@ class Backend:
                 old_size = glfw.get_window_size(gl_window)
                 app_window.run_create_window()
                 window_state.apply_bounds() # Recalculate window size
-                if tuple(window_state.window_size) != tuple(old_size):
-                    new_size = window_state.window_size
+                if tuple(window_state.size) != tuple(old_size):
+                    new_size = window_state.size
                     glfw.set_window_size(gl_window, new_size[0], new_size[1])
 
                 if tuple(window_state.pos) != (-1, -1):
