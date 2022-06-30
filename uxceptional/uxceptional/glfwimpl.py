@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+# modified glfw implementation based on
+# https://github.com/pyimgui/pyimgui/blob/master/doc/examples/integrations_glfw3.py
 from __future__ import absolute_import
 
 import glfw
