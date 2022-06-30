@@ -4,7 +4,7 @@ import imgui
 import OpenGL.GL as gl
 import sys
 from ewmh import EWMH
-from imgui.integrations.glfw import GlfwRenderer
+from .glfwimpl import GlfwImpl
 from .shellwindow import ShellWindow
 from .windowbase import WindowBase
 
