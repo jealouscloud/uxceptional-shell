@@ -56,12 +56,14 @@ class Backend:
 
 
                 impl.process_inputs()
+                old_size = window_state.size
                 window_state.init() # Reset state for drawing
                 imgui.new_frame()
-                old_size = glfw.get_window_size(gl_window)
+                window_size = glfw.get_window_size(gl_window)
                 app_window.run_create_window()
                 window_state.apply_bounds() # Recalculate window size
-                if tuple(window_state.size) != tuple(old_size):
+                if (tuple(window_state.size) != tuple(old_size) or 
+                        tuple(window_state.size) != tuple(window_size)):
                     new_size = window_state.size
                     glfw.set_window_size(gl_window, new_size[0], new_size[1])
 
