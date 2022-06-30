@@ -23,15 +23,17 @@ class Backend:
         default_font = Backend.fonts["default"]
         if default_font == None:
             shellwindow.context = imgui.create_context()
+            imgui.set_current_context(shellwindow.context)
             io = imgui.get_io()
             Backend.fonts["default"] = io.fonts
         else:
             shellwindow.context = imgui.create_context(default_font)
+            imgui.set_current_context(shellwindow.context)
 
         window = Backend.impl_glfw_init(
             shellwindow.window_title, *shellwindow.min_size
         )
-        renderer = GlfwRenderer(window)
+        renderer = GlfwImpl(window)
         shellwindow.window_id = window
         shellwindow.renderer = renderer
         Backend.windowlist.append(windowbase)
@@ -40,13 +42,14 @@ class Backend:
     def run_backend():
         gl.glBlendFunc(gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA)
         while Backend.windowlist:
-            glfw.poll_events()
             for app_window in Backend.windowlist.copy():
                 app_window = app_window  # type: WindowBase
                 window_state = app_window.state
-                impl = window_state.renderer # type: GlfwRenderer
                 gl_window = window_state.window_id
+                impl = window_state.renderer # type: GlfwImpl
                 glfw.make_context_current(gl_window)
+                imgui.set_current_context(window_state.context)
+                glfw.poll_events()
                 if glfw.window_should_close(gl_window):
                     Backend.windowlist.remove(app_window)
                     impl.shutdown()
@@ -54,8 +57,6 @@ class Backend:
                     # TODO: AN IMGUI CONTEXT LEAKS HERE?
                     continue
 
-                if imgui.get_current_context() != window_state.context:
-                    imgui.set_current_context(window_state.context)
 
                 impl.process_inputs()
                 imgui.new_frame()
