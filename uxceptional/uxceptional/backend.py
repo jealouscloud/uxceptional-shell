@@ -15,20 +15,16 @@ class Backend:
         "default": None
     }
 
-    def add_window(windowbase: WindowBase):
+    def add_window(windowbase: WindowBase, fontfiles = []):
         """
         Must be called on the main thread.
         """
         shellwindow = windowbase.state
-        default_font = Backend.fonts["default"]
-        if default_font == None:
             shellwindow.context = imgui.create_context()
             imgui.set_current_context(shellwindow.context)
             io = imgui.get_io()
-            Backend.fonts["default"] = io.fonts
-        else:
-            shellwindow.context = imgui.create_context(default_font)
-            imgui.set_current_context(shellwindow.context)
+        for font in fontfiles:
+            io.fonts.add_font_from_file_ttf(font)
 
         window = Backend.impl_glfw_init(
             shellwindow.window_title, *shellwindow.min_size
