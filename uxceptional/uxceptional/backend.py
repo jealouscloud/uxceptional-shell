@@ -20,9 +20,9 @@ class Backend:
         Must be called on the main thread.
         """
         shellwindow = windowbase.state
-            shellwindow.context = imgui.create_context()
-            imgui.set_current_context(shellwindow.context)
-            io = imgui.get_io()
+        shellwindow.context = imgui.create_context()
+        imgui.set_current_context(shellwindow.context)
+        io = imgui.get_io()
         for font in fontfiles:
             io.fonts.add_font_from_file_ttf(font)
 
@@ -43,8 +43,10 @@ class Backend:
                 window_state = app_window.state
                 gl_window = window_state.window_id
                 impl = window_state.renderer # type: GlfwImpl
+                #region context grabbing
                 glfw.make_context_current(gl_window)
                 imgui.set_current_context(window_state.context)
+                #endregion
                 
                 glfw.poll_events()
                 if glfw.window_should_close(gl_window):
