@@ -95,7 +95,8 @@ class GlfwImpl(ProgrammablePipelineRenderer):
         self.io.display_size = width, height
 
     def mouse_callback(self, *args, **kwargs):
-        pass
+        _, x, y  = args
+        self.io.mouse_pos = (x, y)
 
     def scroll_callback(self, window, x_offset, y_offset):
         self.io.mouse_wheel_horizontal = x_offset
@@ -113,8 +114,6 @@ class GlfwImpl(ProgrammablePipelineRenderer):
 
         if glfw.get_window_attrib(self.window, glfw.FOCUSED):
             io.mouse_pos = glfw.get_cursor_pos(self.window)
-        else:
-            io.mouse_pos = -1, -1
 
         io.mouse_down[0] = glfw.get_mouse_button(self.window, 0)
         io.mouse_down[1] = glfw.get_mouse_button(self.window, 1)
