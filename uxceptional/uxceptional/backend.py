@@ -49,10 +49,11 @@ class Backend:
                 impl = window_state.renderer # type: GlfwImpl
                 glfw.make_context_current(gl_window)
                 imgui.set_current_context(window_state.context)
+                
                 glfw.poll_events()
                 if glfw.window_should_close(gl_window):
                     Backend.windowlist.remove(app_window)
-                    impl.shutdown()
+                    # impl.shutdown() # Normally we would do this, but it just kills our shared font texture
                     glfw.destroy_window(gl_window)
                     # TODO: AN IMGUI CONTEXT LEAKS HERE?
                     continue
