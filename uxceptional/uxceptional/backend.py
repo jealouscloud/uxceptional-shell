@@ -76,7 +76,9 @@ class Backend:
                 window_state.init() # Reset state for drawing
                 imgui.new_frame()
                 window_size = glfw.get_window_size(gl_window)
+                app_window.set_theme()
                 app_window.run_create_window()
+                app_window.unset_theme()
                 window_state.apply_bounds() # Recalculate window size
                 if (tuple(window_state.size) != tuple(old_size) or 
                         tuple(window_state.size) != tuple(window_size)):

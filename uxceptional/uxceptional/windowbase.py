@@ -96,6 +96,17 @@ class WindowBase:
             asyncio.run(self.update_data(self.data))
             sleep(self.data['refresh_period'])
 
+    @abstractmethod
+    def set_theme(self):
+        """
+        Set theme for this window
+        """
+        pass
+
+    @abstractmethod
+    def unset_theme(self):
+        pass
+    
     def run_create_window(self):
         if not self.initialized:
             asyncio.run(self._init())
