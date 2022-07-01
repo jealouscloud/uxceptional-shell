@@ -129,6 +129,7 @@ class Backend:
             int(width), int(height), window_name, None, None
         )
         glfw.make_context_current(window)
+        glfw.swap_interval(1) # enable vsync
 
         if not window:
             glfw.terminate()
