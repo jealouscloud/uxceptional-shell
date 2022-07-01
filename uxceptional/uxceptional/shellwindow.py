@@ -29,6 +29,10 @@ class ShellWindow:
         max_size=None,
         dock_direction=Direction.Nothing,
         monitor_preference=MonitorPreference.Unset,
+        focus_on_show=False,
+        user_resizable=False,
+        is_statusbar=False
+
     ):
         if not min_size:
             min_size = [100, 100]
@@ -46,6 +50,9 @@ class ShellWindow:
         self.dock = dock_direction
         self.window_title = window_title
         self.monitor_preference = monitor_preference
+        self.focus_on_show = focus_on_show
+        self.user_resizable = user_resizable
+        self.is_statusbar = is_statusbar
         self.renderer = None  # GlfwRenderer
         self.window_id = None
         self.context = None

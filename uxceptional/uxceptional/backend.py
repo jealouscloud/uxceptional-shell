@@ -34,8 +34,8 @@ class Backend:
         for font in fontfiles:
             io.fonts.add_font_from_file_ttf(font)
 
-        window = Backend.impl_glfw_init(
-            shellwindow.window_title, *shellwindow.min_size
+        window = Backend.glfw_init_window(
+            shellwindow
         )
         renderer = GlfwImpl(window)
         shellwindow.window_id = window
@@ -85,6 +85,8 @@ class Backend:
                 app_window.run_create_window()
                 app_window.unset_theme()
                 window_state.apply_bounds() # Recalculate window size
+
+                #region repositioning and resizing
                 if (tuple(window_state.size) != tuple(old_size) or 
                         tuple(window_state.size) != tuple(window_size)):
                     new_size = window_state.size
@@ -99,41 +101,48 @@ class Backend:
                         req_y = y
                     if (req_x, req_y) != (x, y):
                         glfw.set_window_pos(gl_window, req_x, req_y)
+                #endregion
 
                 gl.glClearColor(0, 0, 0, 0)
                 gl.glClear(gl.GL_COLOR_BUFFER_BIT)
-                # glfw.swap_interval(1)
+                
                 imgui.render()
                 impl.render(imgui.get_draw_data())
                 glfw.swap_buffers(gl_window)
 
         glfw.terminate()
 
-    def impl_glfw_init(window_name, width, height):
+    def glfw_init_window(shellwindow: ShellWindow):
         CLASS_NAME = "uxceptional"
         if not glfw.init():
             sys.exit("Could not initialize GLFW")
 
+        width, height = shellwindow.min_size
         glfw.window_hint(glfw.CONTEXT_VERSION_MAJOR, 3)
         glfw.window_hint(glfw.CONTEXT_VERSION_MINOR, 3)
         glfw.window_hint(glfw.OPENGL_PROFILE, glfw.OPENGL_CORE_PROFILE)
         glfw.window_hint_string(glfw.X11_CLASS_NAME, CLASS_NAME)
         glfw.window_hint_string(glfw.X11_INSTANCE_NAME, CLASS_NAME)
-        glfw.window_hint(glfw.FLOATING, glfw.TRUE)
-        glfw.window_hint(glfw.TRANSPARENT_FRAMEBUFFER, glfw.TRUE)
-        glfw.window_hint(glfw.FOCUS_ON_SHOW, glfw.TRUE)
         glfw.window_hint(glfw.OPENGL_FORWARD_COMPAT, gl.GL_TRUE)
+        
+        # Tell our WM we don't want to tile
+        glfw.window_hint(glfw.FLOATING, glfw.TRUE)
+        # Enable transparency
+        glfw.window_hint(glfw.TRANSPARENT_FRAMEBUFFER, glfw.TRUE)
+        if shellwindow.focus_on_show:
+            glfw.window_hint(glfw.FOCUS_ON_SHOW, glfw.TRUE)
+        
 
         # Create a windowed mode window and its OpenGL context
         window = glfw.create_window(
-            int(width), int(height), window_name, None, None
+            int(width), int(height), shellwindow.window_title, None, None
         )
         glfw.make_context_current(window)
         glfw.swap_interval(1) # enable vsync
 
         if not window:
             glfw.terminate()
-            print("Could not initialize Window")
+            print(f"Could not initialize Window {shellwindow.window_title}")
             exit(1)
 
         return window
