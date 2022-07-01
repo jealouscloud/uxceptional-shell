@@ -43,15 +43,20 @@ class Backend:
         Backend.windowlist.append(windowbase)
         shellwindow.apply_monitor_preference()
 
+    def add_windows_from_queue():
+        """
+        Process and clear the window creation queue
+        """        
+        for windowbase in Backend.windowqueue:
+            Backend._add_window(windowbase)
+        if Backend.windowlist:
+            Backend.windowqueue.clear()
+
     def run_backend():
         gl.glBlendFunc(gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA)
         while Backend.windowlist or Backend.windowqueue:
             ## Create windows from queue
-            for windowbase in Backend.windowqueue:
-                Backend._add_window(windowbase)
-
-            Backend.windowqueue.clear() # we just created them above
-
+            Backend.add_windows_from_queue()
             for app_window in Backend.windowlist.copy():
                 app_window = app_window  # type: WindowBase
                 window_state = app_window.state
