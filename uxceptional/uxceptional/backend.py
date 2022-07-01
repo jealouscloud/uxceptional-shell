@@ -11,11 +11,19 @@ from .windowbase import WindowBase
 
 class Backend:
     windowlist = []
+    windowqueue = []
     fonts = {
         "default": None
     }
+    def add_window(windowbase: WindowBase):
+        """Add a window
 
-    def add_window(windowbase: WindowBase, fontfiles = []):
+        Args:
+            windowbase (WindowBase): [description]
+        """
+        Backend.windowqueue.append(windowbase)
+
+    def _add_window(windowbase: WindowBase, fontfiles = []):
         """
         Must be called on the main thread.
         """
@@ -37,7 +45,13 @@ class Backend:
 
     def run_backend():
         gl.glBlendFunc(gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA)
-        while Backend.windowlist:
+        while Backend.windowlist or Backend.windowqueue:
+            ## Create windows from queue
+            for windowbase in Backend.windowqueue:
+                Backend._add_window(windowbase)
+
+            Backend.windowqueue.clear() # we just created them above
+
             for app_window in Backend.windowlist.copy():
                 app_window = app_window  # type: WindowBase
                 window_state = app_window.state
