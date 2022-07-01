@@ -19,7 +19,7 @@ class Backend:
         """Add a window
 
         Args:
-            windowbase (WindowBase): [description]
+            windowbase (WindowBase): Window to add
         """
         Backend.windowqueue.append(windowbase)
 
