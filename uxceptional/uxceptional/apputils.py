@@ -4,7 +4,7 @@ import subprocess
 import asyncio
 from PIL import Image
 import OpenGL.GL as gl
-
+from xdg import IconTheme
 # This can / should be overridden
 resources_dir = None
 
@@ -18,13 +18,20 @@ def event(path, name):
     """
     print(f"{path}.{name}")
 
+def load_icon(icon_name, icon_size):
+    path = IconTheme.getIconPath(icon_name, icon_size)
+    return load_texture(path)
 
-def loadimg(resource_name):
+def load_texture(path):
+    """From an image path, return an opengl texture
+
+    Args:
+        path (str): Path to icon
+
+    Returns:
+        int: OpenGL texture ID
     """
-    Load image as OpenGL texture. Return that texture ID
-    """
-    global resources_dir
-    with Image.open(resources_dir / resource_name) as im:
+    with Image.open(path) as im:
         convert = im.convert("RGBA")
         textureData = convert.tobytes()
         width = im.width
@@ -48,6 +55,14 @@ def loadimg(resource_name):
 
     gl.glBindTexture(gl.GL_TEXTURE_2D, 0)  # cleanup
     return tex
+
+def loadimg(resource_name):
+    """
+    Load image as OpenGL texture. Return that texture ID
+    """
+    global resources_dir
+    return load_texture(Path(resources_dir) / resource_name)
+
 
 
 def run(
