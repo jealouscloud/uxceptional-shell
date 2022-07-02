@@ -82,7 +82,6 @@ class BottomStatusBar(WindowBase):
                 key="spotify", function=DataSource.spotify, delay_ms=1000
             )
         )
-        self.textures = {}
 
     def init_hook(self):
         self.textures = {
