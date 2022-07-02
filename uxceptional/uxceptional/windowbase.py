@@ -31,8 +31,8 @@ class WindowBase:
     """
     Basis for every shell window implementation
     """
-    def __init__(self, state: ShellWindow) -> None:
-        self.state = state
+    def __init__(self) -> None:
+        self.state = ShellWindow() # default, should be created by implementation
         self.thread_lock = Lock()
         
         # The window data store
