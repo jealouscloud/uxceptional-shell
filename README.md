@@ -8,7 +8,7 @@ uxceptional uses:
 
 Users of this library are intended to define their own imgui windows by implementing `WindowBase`
 
-A basic example
+A basic example stripped from [examples/](examples/basic/basic.py)
 ```python
 from uxceptional import WindowBase, Direction, MonitorPreference, ShellWindow, DataFetcher
 import uxceptional.apputils as utils
@@ -38,11 +38,9 @@ class ExampleWindow(WindowBase):
         """
         with self.imgui_window("Simple Window"):
             imgui.text("Simple window with simple text")
-            imgui.set_window_size(200,200)
+            imgui.set_window_size(500,200)
             dt = self.data.get("date", None)
             if dt:
                 imgui.text(f"The time is {dt}")
 ```
 
-
-More detailed examples are provided in `examples/`
