@@ -98,13 +98,11 @@ async def run_async(
         stdout, stderr = await proc.communicate()
         return subprocess.CompletedProcess(args, proc.returncode, stdout.decode("utf-8", errors="surrogateescape"), stderr.decode("utf-8", errors="surrogateescape"))
     else:
-        proc = asyncio.create_subprocess_exec(args,
+        proc = await asyncio.create_subprocess_exec(args,
                                                 stdout=asyncio.subprocess.PIPE,
-                                                stderr=asyncio.subprocess.PIPE,
-                                                encoding="utf-8",
-                                                errors="surrogateescape"
+                                                stderr=asyncio.subprocess.PIPE
         )
-        stdout, stderr = proc.communicate()
+        stdout, stderr = await proc.communicate()
         return subprocess.CompletedProcess(args, proc.returncode, stdout.decode("utf-8", errors="surrogateescape"), stderr.decode("utf-8", errors="surrogateescape"))
 
 def vec_color(hex) -> tuple[float, float, float, float]:
