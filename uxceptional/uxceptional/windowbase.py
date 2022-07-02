@@ -86,6 +86,27 @@ class WindowBase:
             yield window
         finally:
             imgui.end()
+    
+    def imgui_icon(self, texture_name, size):
+        """Draw an image from self.textures
+
+        Args:
+            texture_name (str): Name of texture in self.textures
+            size (int): icon size in px
+        """
+        if texture_name not in self.textures:
+            raise ValueError(f"Unable to find {texture_name} in texture atlas")
+
+        cursor = imgui.get_cursor_pos()
+        imgui.get_window_draw_list().add_image(
+            self.textures[texture_name],
+            (cursor.x, cursor.y),
+            (cursor.x + size, cursor.y + size),
+        )
+        cursor = (cursor.x + size, cursor.y)
+        imgui.set_cursor_pos(cursor)
+
+
 
     def _data_thread(self):
         """
